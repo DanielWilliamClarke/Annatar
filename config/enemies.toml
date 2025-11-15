@@ -95,19 +95,75 @@ animation_frame_duration = 0.08
 animation_loop = true
 
 # Enemy spawn waves configuration
+# New ECS-based spawn system supports:
+# - wave_N_delay: Delay before wave starts (seconds)
+# - wave_N_count: Number of enemies in wave (for discrete waves) or max concurrent (for continuous)
+# - wave_N_enemy: Single enemy type to spawn
+# - wave_N_enemies: Array of enemy types to randomly select from (adds variety!)
+# - wave_N_interval: Spawn interval between enemies (default 0.5s for discrete, 1.0s for continuous)
+# - wave_N_interval_variance: Random variance in spawn timing (adds unpredictability!)
+# - wave_N_position_variance: Random Y-position variance in pixels (default 50.0)
+# - wave_N_continuous: true = spawn forever, false = spawn once then done (default false)
+
 [spawn_waves]
+# Wave 1: Basic scouts - discrete wave with slight timing variance
 wave_1_delay = 2.0
 wave_1_count = 5
 wave_1_enemy = "basic"
+wave_1_interval = 0.8
+wave_1_interval_variance = 0.3  # ±0.3s randomness
+wave_1_position_variance = 80.0
+wave_1_continuous = false
 
+# Wave 2: Fast fighters with sine wave - continuous spawn with randomness
 wave_2_delay = 5.0
-wave_2_count = 3
+wave_2_count = 3  # Max 3 concurrent
 wave_2_enemy = "fast"
+wave_2_interval = 3.0
+wave_2_interval_variance = 1.0  # ±1.0s randomness - spices it up!
+wave_2_position_variance = 100.0
+wave_2_continuous = true  # Keeps spawning!
 
-wave_3_delay = 10.0
-wave_3_count = 1
-wave_3_enemy = "heavy"
+# Wave 3: Mixed scout formation - randomly selects from basic/fast for variety
+wave_3_delay = 8.0
+wave_3_count = 7
+wave_3_enemies = ["basic", "fast", "basic", "fast"]  # Pool to select from
+wave_3_interval = 0.6
+wave_3_interval_variance = 0.4
+wave_3_position_variance = 120.0
+wave_3_continuous = false
 
-wave_4_delay = 15.0
-wave_4_count = 2
-wave_4_enemy = "orbital"
+# Wave 4: Heavy cruiser - single tough enemy
+wave_4_delay = 12.0
+wave_4_count = 1
+wave_4_enemy = "heavy"
+wave_4_interval = 0.5
+wave_4_position_variance = 50.0
+wave_4_continuous = false
+
+# Wave 5: Orbital bombers - continuous with moderate spawn rate
+wave_5_delay = 15.0
+wave_5_count = 2  # Max 2 concurrent
+wave_5_enemy = "orbital"
+wave_5_interval = 5.0
+wave_5_interval_variance = 1.5  # ±1.5s for unpredictability
+wave_5_position_variance = 90.0
+wave_5_continuous = true
+
+# Wave 6: Kamikaze swarm - burst of fast attackers
+wave_6_delay = 20.0
+wave_6_count = 10
+wave_6_enemy = "kamikaze"
+wave_6_interval = 0.3  # Fast spawning!
+wave_6_interval_variance = 0.15
+wave_6_position_variance = 150.0
+wave_6_continuous = false
+
+# Wave 7: Mixed chaos - all enemy types with high variance
+wave_7_delay = 25.0
+wave_7_count = 5  # Max 5 concurrent
+wave_7_enemies = ["basic", "fast", "orbital", "kamikaze", "heavy"]  # Full variety!
+wave_7_interval = 2.5
+wave_7_interval_variance = 1.2  # Lots of randomness!
+wave_7_position_variance = 120.0
+wave_7_continuous = true  # Continuous chaos!

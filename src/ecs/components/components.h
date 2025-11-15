@@ -72,6 +72,10 @@ struct Physics {
     float friction{0.5f};                // Damping coefficient (higher = faster stopping)
     float movement_force{10.0f};         // Force magnitude from input
     sf::Vector2f acceleration{0.0f, 0.0f};  // Current acceleration (calculated each frame)
+
+    // Enemy physics forces (for entities with Movement.use_physics = true)
+    sf::Vector2f gravity{0.0f, 0.0f};    // Gravity force vector (e.g., {0, 9.81})
+    sf::Vector2f thrust{0.0f, 0.0f};     // Thrust force vector (e.g., {0, -9.81})
 };
 
 // Movement component - movement behavior
@@ -98,6 +102,16 @@ struct Movement {
 
     sf::Vector2f direction{0.0f, -1.0f};  // Normalized direction
     std::string script_id;  // Lua script for custom movement
+
+    // World scrolling (Gradius-style background drift)
+    float world_speed{0.0f};  // Background scroll speed (added to enemy movement)
+
+    // Orbital movement tracking
+    sf::Vector2f orbit_center{0.0f, 0.0f};  // Center point for orbital movement
+    bool orbit_initialized{false};  // Has orbit center been set?
+
+    // Physics integration flag
+    bool use_physics{false};  // If true, use Physics component for force-based movement
 };
 
 // Collision component - collision detection data

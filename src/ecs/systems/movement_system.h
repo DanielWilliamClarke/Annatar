@@ -22,17 +22,33 @@ public:
             // Store last position for interpolation
             transform.last_position = transform.position;
 
-            // Update pattern-specific movement
-            UpdateMovementPattern(transform, movement, dt);
+            // Check if using physics-based movement
+            if (movement.use_physics && world.HasComponent<Physics>(entity)) {
+                UpdatePhysicsMovement(world, entity, transform, movement, dt);
+            } else {
+                // Update pattern-specific movement
+                UpdateMovementPattern(world, entity, transform, movement, dt);
 
-            // Apply velocity
-            transform.position += transform.velocity * dt;
+                // Apply velocity
+                transform.position += transform.velocity * dt;
 
-            // Clamp to max speed
-            float speed = std::sqrt(transform.velocity.x * transform.velocity.x +
-                                   transform.velocity.y * transform.velocity.y);
-            if (speed > movement.max_speed) {
-                transform.velocity *= (movement.max_speed / speed);
+                // Clamp to max speed
+                float speed = std::sqrt(transform.velocity.x * transform.velocity.x +
+                                       transform.velocity.y * transform.velocity.y);
+                if (speed > movement.max_speed) {
+                    transform.velocity *= (movement.max_speed / speed);
+                }
+            }
+
+            // Add world scrolling (Gradius-style background drift)
+            if (movement.world_speed > 0.0f) {
+                sf::Vector2f world_velocity(-movement.world_speed, 0.0f);  // Scroll LEFT
+                transform.position += world_velocity * dt;
+
+                // Also apply to orbit center if orbiting
+                if (movement.pattern == Movement::Pattern::ORBITAL) {
+                    movement.orbit_center += world_velocity * dt;
+                }
             }
         }
     }
@@ -54,26 +70,37 @@ public:
     }
 
 private:
-    static void UpdateMovementPattern(Transform& transform, Movement& movement, float dt) {
+    static void UpdateMovementPattern(World& world, entt::entity entity, Transform& transform, Movement& movement, float dt) {
         movement.pattern_time += dt;
 
         switch (movement.pattern) {
             case Movement::Pattern::LINEAR:
-                // Linear movement - velocity already set
+                // Linear movement - constant velocity in direction
                 transform.velocity = movement.direction * movement.speed;
                 break;
 
             case Movement::Pattern::ORBITAL:
                 {
-                    // Circular orbit around a point (using transform.position as center initially)
-                    float angle = movement.pattern_time * movement.orbit_speed;
-                    float x = std::cos(angle) * movement.orbit_radius;
-                    float y = std::sin(angle) * movement.orbit_radius;
+                    // Initialize orbit center on first update (store spawn position)
+                    if (!movement.orbit_initialized) {
+                        movement.orbit_center = transform.position;
+                        movement.orbit_initialized = true;
+                    }
 
-                    // Calculate velocity to reach target position
-                    sf::Vector2f target(x, y);
-                    sf::Vector2f offset = target - transform.position;
-                    transform.velocity = offset * movement.orbit_speed;
+                    // Circular orbit around spawn position
+                    float angle = movement.pattern_time * movement.orbit_speed;
+                    float x = movement.orbit_center.x + std::cos(angle) * movement.orbit_radius;
+                    float y = movement.orbit_center.y + std::sin(angle) * movement.orbit_radius;
+
+                    // Set position directly (not velocity) for smooth circular orbit
+                    transform.position = sf::Vector2f(x, y);
+
+                    // Calculate velocity for interpolation (tangent to circle)
+                    float tangent_angle = angle + 1.5708f;  // +90 degrees in radians
+                    transform.velocity = sf::Vector2f(
+                        std::cos(tangent_angle) * movement.orbit_speed * movement.orbit_radius,
+                        std::sin(tangent_angle) * movement.orbit_speed * movement.orbit_radius
+                    );
                 }
                 break;
 
@@ -94,12 +121,73 @@ private:
                 break;
 
             case Movement::Pattern::FOLLOW_TARGET:
-                // TODO: Implement target following (requires AI component)
+                {
+                    // Find player entity to chase
+                    auto players = world.View<PlayerTag, Transform>();
+                    bool found_player = false;
+
+                    for (auto player : players) {
+                        // Get first player
+                        const auto& player_transform = world.GetComponent<Transform>(player);
+
+                        // Calculate direction to player
+                        sf::Vector2f to_player = player_transform.position - transform.position;
+                        float distance = std::sqrt(to_player.x * to_player.x + to_player.y * to_player.y);
+
+                        if (distance > 0.001f) {
+                            // Normalize direction and apply speed
+                            sf::Vector2f direction = to_player / distance;
+                            transform.velocity = direction * movement.speed;
+                        } else {
+                            // At player position, stop
+                            transform.velocity = sf::Vector2f(0.0f, 0.0f);
+                        }
+
+                        found_player = true;
+                        break;  // Only chase first player
+                    }
+
+                    if (!found_player) {
+                        // No player found, move in default direction
+                        transform.velocity = movement.direction * movement.speed;
+                    }
+                }
                 break;
 
             case Movement::Pattern::SCRIPTED:
                 // TODO: Implement Lua scripted movement
                 break;
+        }
+    }
+
+    static void UpdatePhysicsMovement(World& world, entt::entity entity, Transform& transform, Movement& movement, float dt) {
+        auto& physics = world.GetComponent<Physics>(entity);
+
+        // Calculate total force (gravity + thrust + any pattern forces)
+        sf::Vector2f total_force = physics.gravity + physics.thrust;
+
+        // Apply pattern-based forces if needed
+        // (For now, physics enemies use linear movement with forces)
+        sf::Vector2f pattern_force = movement.direction * movement.speed * physics.mass;
+        total_force += pattern_force;
+
+        // F = ma → a = F/m
+        physics.acceleration = total_force / physics.mass;
+
+        // Update velocity: v = v + a*dt
+        transform.velocity += physics.acceleration * dt;
+
+        // Apply friction/damping
+        transform.velocity *= (1.0f - physics.friction * dt);
+
+        // Apply velocity to position
+        transform.position += transform.velocity * dt;
+
+        // Clamp to max speed
+        float speed = std::sqrt(transform.velocity.x * transform.velocity.x +
+                               transform.velocity.y * transform.velocity.y);
+        if (speed > movement.max_speed) {
+            transform.velocity *= (movement.max_speed / speed);
         }
     }
 

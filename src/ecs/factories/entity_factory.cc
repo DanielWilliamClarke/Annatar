@@ -152,7 +152,8 @@ entt::entity EntityFactory::CreateEnemy(const std::string& enemy_type,
         .orbit_speed = ec.orbit_speed,
         .sine_amplitude = ec.sine_amplitude,
         .sine_frequency = ec.sine_frequency,
-        .direction = ec.direction
+        .direction = ec.direction,
+        .world_speed = constants.world_speed  // Gradius-style background scrolling
     });
 
     // Collision

@@ -121,6 +121,7 @@ struct GameConstants {
     int max_bullets{1000};
     int max_enemies{100};
     int max_particles{500};
+    float world_speed{100.0f};  // Gradius-style background scroll speed (px/s)
 
     // Bounds
     float bounds_min_x{0.0f};

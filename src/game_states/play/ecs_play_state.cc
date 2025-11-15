@@ -57,20 +57,39 @@ void ECSPlayState::Setup() {
               << constants.player_starting_position.x << ", "
               << constants.player_starting_position.y << ")" << std::endl;
 
-    // Spawn initial enemies from right edge (Gradius style!)
-    std::cout << "[ECS] Spawning enemies from right edge..." << std::endl;
+    // Initialize enemy spawn system with wave-based spawning
+    std::cout << "[ECS] Initializing enemy spawn system..." << std::endl;
     std::cout.flush();
-    SpawnEnemy("basic", {850.0f, 150.0f});  // Right edge, top
-    SpawnEnemy("basic", {900.0f, 360.0f});  // Right edge, middle
-    SpawnEnemy("basic", {950.0f, 550.0f});  // Right edge, bottom
+    ecs::EnemySpawnSystem::Initialize();  // Initialize with random seed
 
-    std::cout << "[ECS] Initial enemies spawned" << std::endl;
+    // Load spawn waves from enemies.toml
+    std::cout << "[ECS] Loading spawn waves from config..." << std::endl;
+    std::cout.flush();
+    if (ecs::EnemySpawnSystem::LoadSpawnWaves("config/enemies.toml")) {
+        std::cout << "[ECS] Loaded " << ecs::EnemySpawnSystem::GetWaveCount()
+                  << " spawn waves successfully" << std::endl;
+    } else {
+        std::cerr << "[ECS] Warning: Failed to load spawn waves, falling back to manual spawning" << std::endl;
+        // Fallback: spawn some initial enemies manually
+        SpawnEnemy("basic", {850.0f, 150.0f});  // Right edge, top
+        SpawnEnemy("basic", {900.0f, 360.0f});  // Right edge, middle
+        SpawnEnemy("basic", {950.0f, 550.0f});  // Right edge, bottom
+    }
+
+    std::cout << "[ECS] Enemy spawn system initialized" << std::endl;
     std::cout << "[ECS] Total entities: " << world.GetEntityCount() << std::endl;
 }
 
 void ECSPlayState::TearDown() {
     std::cout << "[ECS] Tearing down ECS Play State..." << std::endl;
+
+    // Clear spawn system state
+    ecs::EnemySpawnSystem::Clear();
+    std::cout << "[ECS] Enemy spawn system cleared" << std::endl;
+
+    // Clear ECS world
     world.Clear();
+    std::cout << "[ECS] World cleared" << std::endl;
 }
 
 void ECSPlayState::Update(float dt) {
@@ -86,7 +105,13 @@ void ECSPlayState::Update(float dt) {
     sf::Vector2f screen_size(bounds.width, bounds.height);
     ecs::BackgroundSystem::Update(world, worldSpeed, dt, screen_size);
 
-    // 4. Movement System - Update positions based on velocity
+    // 3.5. Enemy Spawn System - Spawn enemies based on waves (NEW!)
+    ecs::EnemySpawnSystem::Update(world, dt, *factory, bounds, *textureAtlas);
+
+    // 4. Movement System - Update positions for entities WITH Movement component (enemies!)
+    ecs::MovementSystem::Update(world, dt);
+
+    // 4.5. Movement System (Simple) - Update positions for entities WITHOUT Movement component (bullets, particles)
     ecs::MovementSystem::UpdateSimple(world, dt);
 
     // 5. Bounds System - Clamp player to screen

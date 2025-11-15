@@ -25,7 +25,12 @@ add_custom_command(TARGET ${BINARY} POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/src/assets $<TARGET_FILE_DIR:${BINARY}>/assets
 )
 
-# Copy config files on post build
+# Copy config files on post build (always runs when binary is built)
 add_custom_command(TARGET ${BINARY} POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/config $<TARGET_FILE_DIR:${BINARY}>/config
+    COMMENT "Copying config files to build directory..."
 )
+
+# Add config files as dependencies so changes trigger rebuild
+file(GLOB CONFIG_FILES ${CMAKE_SOURCE_DIR}/config/*.toml)
+set_property(TARGET ${BINARY} APPEND PROPERTY ADDITIONAL_CLEAN_FILES ${CONFIG_FILES})

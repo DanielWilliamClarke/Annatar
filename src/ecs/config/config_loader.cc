@@ -288,6 +288,7 @@ bool ConfigLoader::LoadConstants(const std::string& filepath) {
             if (auto node = game->get("max_bullets")) constants.max_bullets = node->value_or(1000);
             if (auto node = game->get("max_enemies")) constants.max_enemies = node->value_or(100);
             if (auto node = game->get("max_particles")) constants.max_particles = node->value_or(500);
+            if (auto node = game->get("world_speed")) constants.world_speed = node->value_or(100.0f);
         }
 
         // Bounds

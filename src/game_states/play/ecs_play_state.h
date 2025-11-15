@@ -6,6 +6,7 @@
 #include "ecs/ecs.h"
 #include "ecs/config/config_loader.h"
 #include "ecs/factories/entity_factory.h"
+#include "ecs/systems/enemy_spawn_system.h"
 #include <memory>
 
 class ITextureAtlas;

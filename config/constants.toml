@@ -26,6 +26,7 @@ fixed_timestep = 0.016666  # 1/60
 max_bullets = 1000
 max_enemies = 100
 max_particles = 500
+world_speed = 100.0  # Gradius-style background scroll speed (px/s, left direction)
 
 [bounds]
 # Gameplay area boundaries
