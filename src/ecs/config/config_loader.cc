@@ -276,7 +276,7 @@ bool ConfigLoader::LoadConstants(const std::string& filepath) {
             // Physics parameters
             if (auto node = player->get("mass")) constants.player_mass = node->value_or(1.0);
             if (auto node = player->get("friction")) constants.player_friction = node->value_or(0.5);
-            if (auto node = player->get("movement_force")) constants.player_movement_force = node->value_or(10.0);
+            if (auto node = player->get("movement_force")) constants.player_movement_force = node->value_or(1200.0);
         }
 
         // Game constants
