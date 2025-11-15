@@ -1,0 +1,113 @@
+# Enemy Definitions for Annatar
+# Each enemy type defines health, movement, weapons, and scoring
+
+[enemies.basic]
+name = "Basic Scout"
+health = 30.0
+movement_pattern = "linear"
+movement_speed = 100.0
+direction = [-1.0, 0.0]  # Move LEFT (Gradius style!)
+weapon = "enemy_basic"
+score_value = 100.0
+size = [32.0, 32.0]
+collision_radius = 16.0
+color = [255, 100, 100]  # Light red
+# Animation
+animation_sprite_sheet = "enemy1"
+animation_cols = 6
+animation_rows = 1
+animation_frame_duration = 0.1
+animation_loop = true
+
+[enemies.fast]
+name = "Fast Fighter"
+health = 20.0
+movement_pattern = "sine_wave"
+movement_speed = 200.0
+direction = [-1.0, 0.0]  # Move LEFT with sine wave (Gradius style!)
+sine_amplitude = 50.0
+sine_frequency = 2.0
+weapon = "enemy_basic"
+score_value = 150.0
+size = [28.0, 28.0]
+collision_radius = 14.0
+color = [100, 255, 100]  # Light green
+# Animation
+animation_sprite_sheet = "enemy2"
+animation_cols = 4
+animation_rows = 1
+animation_frame_duration = 0.08
+animation_loop = true
+
+[enemies.heavy]
+name = "Heavy Cruiser"
+health = 100.0
+movement_pattern = "linear"
+movement_speed = 50.0
+direction = [-1.0, 0.0]  # Move LEFT (Gradius style!)
+weapon = "enemy_spread"
+score_value = 300.0
+size = [48.0, 48.0]
+collision_radius = 24.0
+color = [100, 100, 255]  # Light blue
+# Animation
+animation_sprite_sheet = "enemy3"
+animation_cols = 8
+animation_rows = 1
+animation_frame_duration = 0.12
+animation_loop = true
+
+[enemies.orbital]
+name = "Orbital Bomber"
+health = 50.0
+movement_pattern = "orbital"
+movement_speed = 150.0
+orbit_radius = 100.0
+orbit_speed = 1.5
+weapon = "enemy_basic"
+score_value = 200.0
+size = [32.0, 32.0]
+collision_radius = 16.0
+color = [255, 255, 100]  # Yellow
+# Animation
+animation_sprite_sheet = "enemy1"
+animation_cols = 6
+animation_rows = 1
+animation_frame_duration = 0.1
+animation_loop = true
+
+[enemies.kamikaze]
+name = "Kamikaze Drone"
+health = 10.0
+movement_pattern = "follow_target"
+movement_speed = 250.0
+direction = [-1.0, 0.0]  # Initial direction LEFT (follows player when detected)
+weapon = ""  # No weapon, damages on collision
+score_value = 50.0
+size = [24.0, 24.0]
+collision_radius = 12.0
+color = [255, 0, 0]  # Red
+# Animation
+animation_sprite_sheet = "enemy4"
+animation_cols = 4
+animation_rows = 1
+animation_frame_duration = 0.08
+animation_loop = true
+
+# Enemy spawn waves configuration
+[spawn_waves]
+wave_1_delay = 2.0
+wave_1_count = 5
+wave_1_enemy = "basic"
+
+wave_2_delay = 5.0
+wave_2_count = 3
+wave_2_enemy = "fast"
+
+wave_3_delay = 10.0
+wave_3_count = 1
+wave_3_enemy = "heavy"
+
+wave_4_delay = 15.0
+wave_4_count = 2
+wave_4_enemy = "orbital"

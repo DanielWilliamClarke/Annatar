@@ -14,13 +14,18 @@ set(EXECUTABLE_NAME ${BINARY})
 
 # Create executable to run game
 add_executable(${EXECUTABLE_NAME} ${SOURCES})
-target_link_libraries(${BINARY} PUBLIC ImGui-SFML::ImGui-SFML range-v3)
+target_link_libraries(${BINARY} PUBLIC ImGui-SFML::ImGui-SFML range-v3 EnTT::EnTT tomlplusplus::tomlplusplus)
 
 # Create lib for testing purposes
 add_library(${BINARY_LIB} STATIC ${SOURCES})
-target_link_libraries(${BINARY_LIB} PUBLIC ImGui-SFML::ImGui-SFML range-v3)
+target_link_libraries(${BINARY_LIB} PUBLIC ImGui-SFML::ImGui-SFML range-v3 EnTT::EnTT tomlplusplus::tomlplusplus)
 
 # Copy assets on post build
 add_custom_command(TARGET ${BINARY} POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/src/assets $<TARGET_FILE_DIR:${BINARY}>/assets
+)
+
+# Copy config files on post build
+add_custom_command(TARGET ${BINARY} POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/config $<TARGET_FILE_DIR:${BINARY}>/config
 )

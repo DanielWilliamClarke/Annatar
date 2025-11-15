@@ -5,6 +5,7 @@
 enum class GameStates {
 	MENU,
 	PLAY,
+	ECS_PLAY,  // NEW: ECS-based play state
 	PAUSE,
 	STOP,
 	SCORES,

@@ -1,9 +1,14 @@
 #include "texture_atlas.h"
+#include <iostream>
 
 std::shared_ptr<ITextureAtlas> TextureAtlas::AddTexture(const std::string& tag, const std::string& texturePath)
 {
 	sf::Image image;
-	image.loadFromFile(texturePath);
+	if (!image.loadFromFile(texturePath)) {
+		std::cerr << "ERROR: Failed to load texture: " << texturePath << std::endl;
+		// Create a fallback pink texture so game doesn't crash
+		image.create(32, 32, sf::Color::Magenta);
+	}
 
 	auto backgroundColor = image.getPixel(0, 0);
 	image.createMaskFromColor(backgroundColor);

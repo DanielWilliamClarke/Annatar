@@ -1,0 +1,106 @@
+{
+  "name": "level 1",
+  "type": "mission | survival | ReachMinScore",
+  "stages": [
+    {
+      "start": "MinScore | AtTime | AfterBoss",
+      "ends": true,
+      "level": {
+        "background": "some enum"
+      },
+      "enemies": [
+        {
+          "spawnRate": 1.0,
+          "animation": {
+            "sprite": "enemy1",
+            "frames": 6,
+            "frameDuration": 0.1,
+            "scale": 1.0
+          },
+          "movement": {
+            "type": "orbital | offset | follow | kamikaze",
+            "speed": 200.0
+          },
+          "attribute": {
+            "health": 20.0,
+            "shields": 0.0,
+            "damageColor": {
+              "red": 247,
+              "green": 99,
+              "blue": 0,
+              "alpha": 255
+            }
+          },
+          "weapon": {
+            "type": "SingleShot",
+            "slot": 1,
+            "delay": 3.0,
+            "damage": 10.0,
+            "lifetime": 3.0,
+            "speed": 350.0,
+            "rotation": 10.0,
+            "glow": 150.0,
+            // Gun specific args
+            "bullets": 1.0,
+            "arcAngle": 0.0,
+            "beams": 0.0,
+            "duration": 0.0
+          },
+        }
+      ],
+      "bosses": [
+        {
+          "animation": {
+            "sprite": "boos1",
+            "frames": 6,
+            "frameDuration": 0.1,
+            "scale": 1.0
+          },
+          "movement": {
+            "speed": 50.0
+          },
+          "attribute": {
+            "health": 200.0,
+            "shields": 50.0,
+            "damageColor": {
+              "red": 247,
+              "green": 99,
+              "blue": 0,
+              "alpha": 255
+            }
+          },
+          "weapon": {
+            "type": "Beam",
+            "slot": 1,
+            "delay": 3.0,
+            "damage": 10.0,
+            "lifetime": 3.0,
+            "speed": 350.0,
+            "rotation": 10.0,
+            "glow": 150.0,
+            // Gun specific args
+            "bullets": 1.0,
+            "arcAngle": 0.0,
+            "beams": 0.0,
+            "duration": 0.0
+          }
+        }
+      ],
+      "weaponUpgrades": [
+        {
+
+        }
+      ],
+      "buffs": [
+        {
+
+        }
+      ],
+      "debuffs": [
+        {
+
+        }
+      ]
+    }
+  ]
+}

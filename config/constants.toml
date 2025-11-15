@@ -1,0 +1,66 @@
+# Game Constants for Annatar
+# Centralized configuration for gameplay tuning
+
+[player]
+max_health = 100.0
+max_shield = 50.0
+shield_regen_rate = 10.0  # HP per second
+shield_regen_delay = 2.0   # Seconds after damage before regen starts
+movement_speed = 300.0
+max_speed = 400.0
+collision_radius = 16.0
+size = [32.0, 32.0]
+starting_position = [150.0, 360.0]  # Left side, vertically centered (Gradius style!)
+starting_weapon = "plasma_rifle"
+
+# Movement physics (creates smooth "floaty" Gradius feel)
+mass = 1.0              # Mass in kg (higher = more inertia)
+friction = 1.5          # Damping coefficient (higher = faster stopping)
+movement_force = 600.0  # Force from input (higher = faster acceleration)
+
+[game]
+window_width = 800
+window_height = 600
+target_fps = 60
+fixed_timestep = 0.016666  # 1/60
+max_bullets = 1000
+max_enemies = 100
+max_particles = 500
+
+[bounds]
+# Gameplay area boundaries
+min_x = 0.0
+max_x = 800.0
+min_y = 0.0
+max_y = 600.0
+despawn_margin = 100.0  # Extra space before despawning off-screen entities
+
+[collision_layers]
+# Bit flags for collision detection
+player = 0x01
+enemy = 0x02
+enemy_bullet = 0x04
+player_bullet = 0x08
+powerup = 0x10
+
+[particles]
+bullet_hit_lifetime = 0.3
+bullet_hit_count = 8
+bullet_hit_speed = 100.0
+
+explosion_lifetime = 0.5
+explosion_count = 16
+explosion_speed = 150.0
+
+[debug]
+show_collision_shapes = false
+show_fps = true
+show_entity_count = true
+god_mode = false
+unlimited_ammo = false
+
+[performance]
+use_spatial_partitioning = true
+quadtree_max_depth = 6
+quadtree_max_objects = 10
+enable_multithreading = false  # Reserved for future use

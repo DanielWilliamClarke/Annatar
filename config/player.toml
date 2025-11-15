@@ -1,0 +1,93 @@
+# Player Configuration for Annatar
+# Defines the player ship and its sub-entities (Gradius-style Options/Multiples)
+
+# Main player ship
+[player.ship]
+sprite_sheet = "viperFrames"
+animation_cols = 3  # 3 columns
+animation_rows = 2  # 2 rows
+weapon = "plasma_rifle"
+weapon_slot = 1
+
+# Animation definitions for player ship
+[[player.ship.animations]]
+name = "idle"
+id = 0
+row = 0           # Row 0, frame 0
+start_col = 0
+frame_count = 1
+duration = 0.2
+loop = true
+
+[[player.ship.animations]]
+name = "moving_down"
+id = 1
+row = 0           # Row 0 = banking down
+start_col = 0
+frame_count = 3   # All 3 frames in row 0
+duration = 0.1    # Faster banking
+loop = false      # Play once and hold on banked frame!
+
+[[player.ship.animations]]
+name = "moving_up"
+id = 2
+row = 1           # Row 1 = banking up
+start_col = 0
+frame_count = 3   # All 3 frames in row 1
+duration = 0.1    # Faster banking
+loop = false      # Play once and hold on banked frame!
+
+# Player exhaust (engine trail)
+[player.exhaust]
+sprite_sheet = "viperExhaust"
+animation_cols = 2
+animation_rows = 1
+offset = [-20.0, 0.0]  # Behind the ship
+weapon_slot = 0  # No weapon
+
+[[player.exhaust.animations]]
+name = "idle"
+id = 0
+row = 0
+start_col = 0
+frame_count = 2   # 2-frame flicker animation
+duration = 0.1    # Fast flicker
+loop = true
+
+# Player turret (wing-mounted turret)
+[player.turret]
+sprite_sheet = "viperTurret"
+animation_cols = 4
+animation_rows = 1
+offset = [10.0, 5.0]  # On the wing
+weapon = "homing_missiles"
+weapon_slot = 2
+
+[[player.turret.animations]]
+name = "idle"
+id = 0
+row = 0
+start_col = 0
+frame_count = 4   # 4-frame rotation animation
+duration = 0.05   # Very fast rotation
+loop = true
+
+# Player glowie (orbital companion - like Gradius Options)
+[player.glowie]
+sprite_sheet = "playerGlowie"
+animation_cols = 7
+animation_rows = 1
+offset = [0.0, 0.0]      # Orbital positioning handled by movement
+orbital_radius = 50.0    # Orbits around ship
+orbital_speed = 2.0      # Rotation speed
+weapon = "spread_cannon"
+weapon_slot = 3
+
+[[player.glowie.animations]]
+name = "idle"
+id = 0
+row = 0
+start_col = 0
+frame_count = 4   # Use first 4 frames of 7
+duration = 0.05   # Fast pulsing
+loop = true

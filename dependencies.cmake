@@ -44,3 +44,19 @@ FetchContent_Declare(
     GIT_TAG "97452bb3eb74a73fc86504421a6a27c92bce6b99"
 )
 FetchContent_MakeAvailable(Range-v3)
+
+# EnTT (Entity Component System)
+FetchContent_Declare(
+    EnTT
+    GIT_REPOSITORY "https://github.com/skypjack/entt"
+    GIT_TAG "v3.13.0"
+)
+FetchContent_MakeAvailable(EnTT)
+
+# tomlplusplus (TOML config parser - header-only)
+FetchContent_Declare(
+    tomlplusplus
+    GIT_REPOSITORY "https://github.com/marzer/tomlplusplus"
+    GIT_TAG "v3.4.0"
+)
+FetchContent_MakeAvailable(tomlplusplus)

@@ -12,6 +12,7 @@
 
 #include "game_states/play/play_state_builder.h"
 #include "game_states/play/play_state.h"
+#include "game_states/play/ecs_play_state.h"
 #include "game_states/menu/menu_state.h"
 
 Game::Game()
@@ -74,15 +75,26 @@ void Game::InitTextureAtlas()
 			->AddTexture("big_core_mk_ii", "assets/bosses/big_core_mk_iii.png");
 }
 
-void Game::InitGameStates() 
+void Game::InitGameStates()
 {
 	auto menuState = std::make_shared<MenuState>();
+
+	// Legacy play state
 	auto playState = std::make_shared<PlayState>(
 		std::make_unique<PlayStateBuilder>(this->bounds, this->textureAtlas)
     );
 
+	// NEW: ECS play state
+	auto ecsPlayState = std::make_shared<ECSPlayState>(
+		this->textureAtlas,
+		this->bounds
+	);
+
+	// Set up transitions
 	menuState->AddTransition(GameStates::PLAY, playState);
+	menuState->AddTransition(GameStates::ECS_PLAY, ecsPlayState);
 	playState->AddTransition(GameStates::MENU, menuState);
+	ecsPlayState->AddTransition(GameStates::MENU, menuState);
 
 	this->state = menuState;
 }
