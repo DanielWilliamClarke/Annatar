@@ -5,6 +5,7 @@
 #include <string>
 #include <optional>
 #include <unordered_map>
+#include <array>
 #include <SFML/Graphics.hpp>
 #include "../components/components.h"
 
@@ -80,6 +81,9 @@ struct PlayerConfig {
     PlayerPartConfig exhaust;
     PlayerPartConfig turret;
     PlayerPartConfig glowie;
+
+    // Multi-weapon system (ECS)
+    std::array<std::string, 4> weapon_slots{};  // Weapon names for slots 1-4
 };
 
 /**

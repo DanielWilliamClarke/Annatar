@@ -26,17 +26,35 @@ class WeaponSystem {
 public:
     using BulletSpawnCallback = std::function<void(const BulletSpawnRequest&)>;
 
-    // Update weapon cooldowns
+    // Update weapon cooldowns (single weapon - for enemies)
     static void Update(World& world, float dt) {
-        auto view = world.View<Weapon>();
-
-        for (auto entity : view) {
-            auto& weapon = view.get<Weapon>(entity);
+        // Update single Weapon components (enemies)
+        auto weapon_view = world.View<Weapon>();
+        for (auto entity : weapon_view) {
+            auto& weapon = weapon_view.get<Weapon>(entity);
 
             if (weapon.current_cooldown > 0.0f) {
                 weapon.current_cooldown -= dt;
                 if (weapon.current_cooldown < 0.0f) {
                     weapon.current_cooldown = 0.0f;
+                }
+            }
+        }
+
+        // Update Weapons components (multi-weapon - for players)
+        auto weapons_view = world.View<Weapons>();
+        for (auto entity : weapons_view) {
+            auto& weapons = weapons_view.get<Weapons>(entity);
+
+            for (int i = 0; i < 4; ++i) {
+                if (weapons.slots[i].has_value()) {
+                    auto& weapon = *weapons.slots[i];
+                    if (weapon.current_cooldown > 0.0f) {
+                        weapon.current_cooldown -= dt;
+                        if (weapon.current_cooldown < 0.0f) {
+                            weapon.current_cooldown = 0.0f;
+                        }
+                    }
                 }
             }
         }
@@ -90,25 +108,66 @@ public:
     // Fire all active weapons on an entity
     static void FireAllWeapons(World& world, entt::entity entity,
                               BulletSpawnCallback spawn_callback) {
-        // Check if entity has weapon component
-        if (!world.HasComponent<Weapon>(entity)) {
-            return;
-        }
+        // Check if entity has Weapons component (multi-weapon)
+        if (world.HasComponent<Weapons>(entity)) {
+            auto& weapons = world.GetComponent<Weapons>(entity);
+            const auto& transform = world.GetComponent<Transform>(entity);
 
-        // For now, just fire the single weapon
-        // Later we'll handle multiple weapon slots
-        TryFire(world, entity, spawn_callback);
+            // Fire each active weapon slot
+            for (int i = 0; i < 4; ++i) {
+                if (weapons.slots[i].has_value()) {
+                    auto& weapon = *weapons.slots[i];
+
+                    // Check if weapon can fire
+                    if (weapon.active && weapon.current_cooldown <= 0.0f) {
+                        // Reset cooldown
+                        weapon.current_cooldown = weapon.cooldown;
+
+                        // Fire based on weapon type
+                        switch (weapon.type) {
+                            case Weapon::Type::SINGLE_SHOT:
+                                FireSingleShot(entity, transform, weapon, spawn_callback);
+                                break;
+
+                            case Weapon::Type::BURST:
+                                FireBurst(entity, transform, weapon, spawn_callback);
+                                break;
+
+                            case Weapon::Type::RANDOM_SPREAD:
+                                FireRandomSpread(entity, transform, weapon, spawn_callback);
+                                break;
+
+                            case Weapon::Type::BEAM:
+                                // TODO: Implement beam weapons
+                                break;
+
+                            case Weapon::Type::HOMING:
+                                // TODO: Implement homing missiles
+                                break;
+                        }
+                    }
+                }
+            }
+        }
+        // Fallback to single Weapon component (for enemies)
+        else if (world.HasComponent<Weapon>(entity)) {
+            TryFire(world, entity, spawn_callback);
+        }
     }
 
-    // Toggle weapon active state
-    static void ToggleWeapon(World& world, entt::entity entity, int slot) {
-        if (!world.HasComponent<Weapon>(entity)) {
-            return;
+    // Toggle weapon slot active state (works with both Weapon and Weapons components)
+    static void ToggleWeaponSlot(World& world, entt::entity entity, int slot) {
+        // Try Weapons component first (multi-weapon)
+        if (world.HasComponent<Weapons>(entity)) {
+            auto& weapons = world.GetComponent<Weapons>(entity);
+            weapons.ToggleSlot(slot);
         }
-
-        auto& weapon = world.GetComponent<Weapon>(entity);
-        if (weapon.slot == slot) {
-            weapon.active = !weapon.active;
+        // Fallback to single Weapon component (enemies)
+        else if (world.HasComponent<Weapon>(entity)) {
+            auto& weapon = world.GetComponent<Weapon>(entity);
+            if (weapon.slot == slot) {
+                weapon.active = !weapon.active;
+            }
         }
     }
 

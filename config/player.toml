@@ -1,6 +1,13 @@
 # Player Configuration for Annatar
 # Defines the player ship and its sub-entities (Gradius-style Options/Multiples)
 
+# Player weapon slots (ECS multi-weapon system)
+[player.weapons]
+slot_1 = "plasma_rifle"      # Default starter weapon (active by default)
+slot_2 = "shotgun"           # Secondary weapon (toggle with key 2)
+slot_3 = "spread_cannon"     # Tertiary weapon (toggle with key 3)
+slot_4 = "homing_missiles"   # Quaternary weapon (toggle with key 4)
+
 # Main player ship
 [player.ship]
 sprite_sheet = "SpaceShooterAssetPack_Ships.png"

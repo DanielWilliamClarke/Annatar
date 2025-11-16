@@ -88,10 +88,25 @@ entt::entity EntityFactory::CreatePlayer(sf::Vector2f position, sf::Texture* tex
     // Player tag
     world.AddComponent<PlayerTag>(entity);
 
-    // Add starting weapon if configured
-    if (auto weapon_cfg = config.GetWeapon(constants.player_starting_weapon)) {
-        world.AddComponent<Weapon>(entity, CreateWeaponFromConfig(*weapon_cfg));
+    // Add multi-weapon system (4 slots loaded from player.toml)
+    const auto& weapon_slots = config.GetPlayerConfig().weapon_slots;
+    Weapons weapons_component;
+
+    for (int i = 0; i < 4; ++i) {
+        const std::string& weapon_name = weapon_slots[i];
+        if (!weapon_name.empty()) {
+            if (auto weapon_cfg = config.GetWeapon(weapon_name)) {
+                Weapon weapon = CreateWeaponFromConfig(*weapon_cfg);
+                weapon.slot = i;  // Set slot number (0-3, displayed as 1-4 to user)
+                weapon.active = (i == 0);  // Slot 1 active by default, others inactive
+                weapons_component.slots[i] = weapon;
+            } else {
+                std::cerr << "Warning: Weapon '" << weapon_name << "' not found in weapons.toml for slot " << (i+1) << std::endl;
+            }
+        }
     }
+
+    world.AddComponent<Weapons>(entity, std::move(weapons_component));
 
     return entity;
 }

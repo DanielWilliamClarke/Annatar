@@ -123,13 +123,22 @@ void ECSPlayState::Update(float dt) {
     // 7. Weapon System - Update cooldowns
     ecs::WeaponSystem::Update(world, dt);
 
-    // 8. Fire weapons if player presses fire
-    auto players = world.View<ecs::PlayerTag, ecs::Input>();
+    // 8. Weapon slot toggling and firing for players
+    auto players = world.View<ecs::PlayerTag, ecs::Input, ecs::Weapons>();
     for (auto entity : players) {
         const auto& player_input = world.GetComponent<ecs::Input>(entity);
+        auto& weapons = world.GetComponent<ecs::Weapons>(entity);
 
+        // Sync weapon slot active states with input slot states
+        // Input component tracks which slots the player wants active (keys 1-4)
+        weapons.SetSlotActive(0, player_input.weapon_slot_1);
+        weapons.SetSlotActive(1, player_input.weapon_slot_2);
+        weapons.SetSlotActive(2, player_input.weapon_slot_3);
+        weapons.SetSlotActive(3, player_input.weapon_slot_4);
+
+        // Fire all active weapons if player presses fire (spacebar)
         if (player_input.fire) {
-            ecs::WeaponSystem::TryFire(world, entity, [&](const ecs::BulletSpawnRequest& request) {
+            ecs::WeaponSystem::FireAllWeapons(world, entity, [&](const ecs::BulletSpawnRequest& request) {
                 factory->CreateBullet(request, true, nullptr);
             });
         }

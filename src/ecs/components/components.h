@@ -6,6 +6,7 @@
 #include <string>
 #include <optional>
 #include <vector>
+#include <array>
 
 namespace ecs {
 
@@ -64,6 +65,55 @@ struct Weapon {
     sf::Color bullet_color{255, 255, 255};
     sf::Vector2f bullet_size{8.0f, 16.0f};
     std::string script_id;  // Lua script for custom behavior
+};
+
+// Weapons component - multi-weapon system (4 slots for player)
+struct Weapons {
+    std::array<std::optional<Weapon>, 4> slots;
+
+    // Helper methods
+    std::vector<int> GetActiveSlots() const {
+        std::vector<int> active;
+        for (int i = 0; i < 4; ++i) {
+            if (slots[i].has_value() && slots[i]->active) {
+                active.push_back(i);
+            }
+        }
+        return active;
+    }
+
+    void ToggleSlot(int slot_index) {
+        if (slot_index >= 0 && slot_index < 4 && slots[slot_index].has_value()) {
+            slots[slot_index]->active = !slots[slot_index]->active;
+        }
+    }
+
+    void SetSlotActive(int slot_index, bool active) {
+        if (slot_index >= 0 && slot_index < 4 && slots[slot_index].has_value()) {
+            slots[slot_index]->active = active;
+        }
+    }
+
+    bool IsSlotActive(int slot_index) const {
+        if (slot_index >= 0 && slot_index < 4 && slots[slot_index].has_value()) {
+            return slots[slot_index]->active;
+        }
+        return false;
+    }
+
+    Weapon* GetSlot(int slot_index) {
+        if (slot_index >= 0 && slot_index < 4 && slots[slot_index].has_value()) {
+            return &(*slots[slot_index]);
+        }
+        return nullptr;
+    }
+
+    const Weapon* GetSlot(int slot_index) const {
+        if (slot_index >= 0 && slot_index < 4 && slots[slot_index].has_value()) {
+            return &(*slots[slot_index]);
+        }
+        return nullptr;
+    }
 };
 
 // Physics component - for acceleration-based movement (creates "floaty" feel)

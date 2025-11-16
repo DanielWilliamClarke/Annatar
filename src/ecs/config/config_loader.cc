@@ -643,6 +643,30 @@ bool ConfigLoader::LoadPlayer(const std::string& filepath) {
             }
         }
 
+        // Load player.weapons (multi-weapon system)
+        if (auto weapons_node = config["player"]["weapons"]) {
+            if (auto weapons_table = weapons_node.as_table()) {
+                // Parse weapon slots 1-4
+                if (auto slot = weapons_table->get("slot_1")) {
+                    player_config.weapon_slots[0] = slot->value_or("");
+                }
+                if (auto slot = weapons_table->get("slot_2")) {
+                    player_config.weapon_slots[1] = slot->value_or("");
+                }
+                if (auto slot = weapons_table->get("slot_3")) {
+                    player_config.weapon_slots[2] = slot->value_or("");
+                }
+                if (auto slot = weapons_table->get("slot_4")) {
+                    player_config.weapon_slots[3] = slot->value_or("");
+                }
+                std::cout << "[ConfigLoader]   ✓ Player weapon slots loaded: ["
+                          << player_config.weapon_slots[0] << ", "
+                          << player_config.weapon_slots[1] << ", "
+                          << player_config.weapon_slots[2] << ", "
+                          << player_config.weapon_slots[3] << "]" << std::endl;
+            }
+        }
+
         std::cout << "Loaded player configuration from " << filepath << std::endl;
         return true;
 
