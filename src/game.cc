@@ -72,7 +72,8 @@ void Game::InitTextureAtlas()
 			->AddTexture("enemy3", "assets/enemy_3.png")
 			->AddTexture("enemy4", "assets/enemy_4.png")
 			->AddTexture("boss1", "assets/boss_1.png")
-			->AddTexture("big_core_mk_ii", "assets/bosses/big_core_mk_iii.png");
+			->AddTexture("big_core_mk_ii", "assets/bosses/big_core_mk_iii.png")
+			->AddTexture("SpaceShooterAssetPack_Ships.png", "assets/ecs/SpaceShooterAssetPack_Ships.png");  // ECS sprite sheet
 }
 
 void Game::InitGameStates()

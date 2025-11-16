@@ -509,6 +509,32 @@ AnimationConfig ConfigLoader::ParseAnimation(const toml::table& entity_table) {
         anim_config.rows = rows_node->value_or(1);
     }
 
+    // Parse direct pixel coordinates (for non-uniform sprite sheets)
+    if (auto sprite_x_node = entity_table.get("sprite_x")) {
+        anim_config.sprite_x = sprite_x_node->value_or(0);
+    }
+
+    if (auto sprite_y_node = entity_table.get("sprite_y")) {
+        anim_config.sprite_y = sprite_y_node->value_or(0);
+    }
+
+    if (auto sprite_width_node = entity_table.get("sprite_width")) {
+        anim_config.sprite_width = sprite_width_node->value_or(8);
+    }
+
+    if (auto sprite_height_node = entity_table.get("sprite_height")) {
+        anim_config.sprite_height = sprite_height_node->value_or(8);
+    }
+
+    // Parse grid position (legacy, for uniform sprite sheets)
+    if (auto sprite_col_node = entity_table.get("sprite_col")) {
+        anim_config.sprite_col = sprite_col_node->value_or(0);
+    }
+
+    if (auto sprite_row_node = entity_table.get("sprite_row")) {
+        anim_config.sprite_row = sprite_row_node->value_or(0);
+    }
+
     // Check for animation array (complex multi-animation entities)
     if (auto animations_node = entity_table.get("animations")) {
         if (auto animations_array = animations_node->as_array()) {

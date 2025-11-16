@@ -102,38 +102,55 @@ entt::entity EntityFactory::CreateEnemy(const std::string& enemy_type,
 
     auto entity = world.CreateEntity();
 
+    // Get texture from config if textureAtlas is available and no texture provided
+    if (!texture && textureAtlas && !ec.animation.sprite_sheet_name.empty()) {
+        texture = textureAtlas->GetTexture(ec.animation.sprite_sheet_name).get();
+    }
+
+    // Calculate scale factor from desired size vs actual sprite size
+    float scale_x = ec.size.x / static_cast<float>(ec.animation.sprite_width);
+    float scale_y = ec.size.y / static_cast<float>(ec.animation.sprite_height);
+    float scale = std::max(scale_x, scale_y);  // Use uniform scale (larger of the two)
+
     // Transform
     world.AddComponent<Transform>(entity, Transform{
         .position = position,
         .last_position = position,
         .velocity = {0.0f, 0.0f},
         .rotation = 0.0f,
-        .scale = 1.0f
+        .scale = scale  // Scale sprite from 8x8→24x24 or 16x16→48x48
     });
 
-    // Calculate frame size from animation config
-    sf::Vector2i frame_size(ec.size.x, ec.size.y);
-    if (texture && ec.animation.cols > 0 && ec.animation.rows > 0) {
-        auto texture_size = texture->getSize();
-        frame_size.x = texture_size.x / ec.animation.cols;
-        frame_size.y = texture_size.y / ec.animation.rows;
-    }
+    // Use direct pixel coordinates from config (supports non-uniform sprite sheets)
+    sf::Vector2i frame_size(ec.animation.sprite_width, ec.animation.sprite_height);
+    sf::IntRect texture_rect(
+        ec.animation.sprite_x,
+        ec.animation.sprite_y,
+        ec.animation.sprite_width,
+        ec.animation.sprite_height
+    );
 
     // Sprite (use White for textured sprites so texture colors show properly!)
+    // Note: origin is in sprite-space (not scaled), size is the actual sprite size
     world.AddComponent<Sprite>(entity, Sprite{
         .texture = texture,
-        .texture_rect = sf::IntRect(0, 0, frame_size.x, frame_size.y),  // Start with first frame
-        .color = texture ? sf::Color::White : ec.color,  // White = use texture colors, fallback to config color
-        .size = sf::Vector2f(frame_size.x, frame_size.y),
-        .origin = sf::Vector2f(frame_size.x / 2.0f, frame_size.y / 2.0f),
+        .texture_rect = texture_rect,  // Use calculated rect based on sprite_x/sprite_y
+        .color = texture ? sf::Color::White : ec.color,  // White = use sprite colors, fallback to config color
+        .size = sf::Vector2f(frame_size.x, frame_size.y),  // Actual sprite size (8x8 or 16x16)
+        .origin = sf::Vector2f(frame_size.x / 2.0f, frame_size.y / 2.0f),  // Center origin (4,4 or 8,8)
         .layer = 5,
         .visible = true
     });
 
     // Animation (if animation config exists) - fully data-driven from TOML!
-    if (!ec.animation.clips.empty()) {
+    // Skip animation for static sprites that use direct pixel coordinates
+    bool uses_direct_coords = (ec.animation.sprite_x != 0 || ec.animation.sprite_y != 0);
+
+    if (!uses_direct_coords && !ec.animation.clips.empty()) {
         world.AddComponent<Animation>(entity, CreateAnimationFromConfig(ec.animation, texture));
     }
+    // Note: Static sprites (with sprite_x/sprite_y set) won't get Animation component
+    // Their texture_rect is set once and never changes
 
     // Health
     world.AddComponent<Health>(entity, Health{

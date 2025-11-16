@@ -50,6 +50,13 @@ public:
                     movement.orbit_center += world_velocity * dt;
                 }
             }
+
+            // AUTO-ROTATE: Point sprite in direction of velocity
+            if (transform.velocity.x != 0.0f || transform.velocity.y != 0.0f) {
+                float angle = std::atan2(transform.velocity.y, transform.velocity.x);
+                transform.rotation = angle * (180.0f / 3.14159f) + 90.0f;
+                // +90° adjusts for vertical shooter sprite orientation (bottom points down → right)
+            }
         }
     }
 
@@ -66,6 +73,13 @@ public:
             auto& transform = view.get<Transform>(entity);
             transform.last_position = transform.position;
             transform.position += transform.velocity * dt;
+
+            // AUTO-ROTATE: Point sprite in direction of velocity (for bullets, particles, etc.)
+            if (transform.velocity.x != 0.0f || transform.velocity.y != 0.0f) {
+                float angle = std::atan2(transform.velocity.y, transform.velocity.x);
+                transform.rotation = angle * (180.0f / 3.14159f) + 90.0f;
+                // +90° adjusts for vertical shooter sprite orientation
+            }
         }
     }
 

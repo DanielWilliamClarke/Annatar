@@ -30,6 +30,17 @@ struct AnimationConfig {
     std::string sprite_sheet_name;
     int cols{1};
     int rows{1};
+
+    // Direct pixel coordinates (for non-uniform sprite sheets)
+    int sprite_x{0};       // Direct x pixel coordinate in sprite sheet
+    int sprite_y{0};       // Direct y pixel coordinate in sprite sheet
+    int sprite_width{8};   // Sprite width in pixels
+    int sprite_height{8};  // Sprite height in pixels
+
+    // Grid-based coordinates (legacy, for uniform grids)
+    int sprite_col{0};  // Column position in sprite sheet (for single-frame sprites)
+    int sprite_row{0};  // Row position in sprite sheet (for single-frame sprites)
+
     std::vector<AnimationClipConfig> clips;
 };
 
