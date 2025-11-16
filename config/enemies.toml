@@ -13,7 +13,7 @@ size = [24.0, 24.0]  # Scaled 3x for visibility (8x8 sprite → 24x24 render)
 collision_radius = 12.0  # Scaled 3x
 color = [255, 255, 255]  # White (use sprite colors)
 # Direct pixel coordinates in sprite sheet
-animation_sprite_sheet = "SpaceShooterAssetPack_Ships.png"
+animation_sprite_sheet = "SpaceShooterAssetPack_Ships"
 sprite_x = 32       # First enemy in 8x8 grid (after 24px player + 8px gap)
 sprite_y = 0        # Top row
 sprite_width = 8    # Actual sprite size in sheet
@@ -35,7 +35,7 @@ size = [24.0, 24.0]  # Scaled 3x for visibility (8x8 sprite → 24x24 render)
 collision_radius = 12.0  # Scaled 3x
 color = [255, 255, 255]  # White (use sprite colors)
 # Direct pixel coordinates in sprite sheet
-animation_sprite_sheet = "SpaceShooterAssetPack_Ships.png"
+animation_sprite_sheet = "SpaceShooterAssetPack_Ships"
 sprite_x = 40       # Second column in 8x8 grid (32 + 8)
 sprite_y = 0        # Top row
 sprite_width = 8    # Actual sprite size in sheet
@@ -55,7 +55,7 @@ size = [48.0, 48.0]  # Scaled 3x for visibility (16x16 sprite → 48x48 render)
 collision_radius = 24.0  # Scaled 3x
 color = [255, 255, 255]  # White (use sprite colors)
 # Direct pixel coordinates in sprite sheet
-animation_sprite_sheet = "SpaceShooterAssetPack_Ships.png"
+animation_sprite_sheet = "SpaceShooterAssetPack_Ships"
 sprite_x = 32       # First large enemy (left column of 16x16 grid)
 sprite_y = 48       # Below the 6x6 small enemy grid (48px down)
 sprite_width = 16   # Actual sprite size in sheet
@@ -76,7 +76,7 @@ size = [24.0, 24.0]  # Scaled 3x for visibility (8x8 sprite → 24x24 render)
 collision_radius = 12.0  # Scaled 3x
 color = [255, 255, 255]  # White (use sprite colors)
 # Direct pixel coordinates in sprite sheet
-animation_sprite_sheet = "SpaceShooterAssetPack_Ships.png"
+animation_sprite_sheet = "SpaceShooterAssetPack_Ships"
 sprite_x = 32       # First column of 8x8 grid
 sprite_y = 8        # Second row (0 + 8)
 sprite_width = 8    # Actual sprite size in sheet
@@ -96,7 +96,7 @@ size = [24.0, 24.0]  # Scaled 3x for visibility (8x8 sprite → 24x24 render)
 collision_radius = 12.0  # Scaled 3x
 color = [255, 255, 255]  # White (use sprite colors)
 # Direct pixel coordinates in sprite sheet
-animation_sprite_sheet = "SpaceShooterAssetPack_Ships.png"
+animation_sprite_sheet = "SpaceShooterAssetPack_Ships"
 sprite_x = 48       # Third column of 8x8 grid (32 + 16)
 sprite_y = 0        # Top row
 sprite_width = 8    # Actual sprite size in sheet

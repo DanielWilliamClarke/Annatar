@@ -16,35 +16,42 @@ entt::entity EntityFactory::CreatePlayer(sf::Vector2f position, sf::Texture* tex
         texture = textureAtlas->GetTexture(player_cfg.sprite_sheet).get();
     }
 
+    // Calculate scale factor from desired size vs actual sprite size
+    float scale_x = constants.player_size.x / static_cast<float>(player_cfg.animation.sprite_width);
+    float scale_y = constants.player_size.y / static_cast<float>(player_cfg.animation.sprite_height);
+    float scale = std::max(scale_x, scale_y);  // Use uniform scale (3.0 for 24/8)
+
     // Transform
     world.AddComponent<Transform>(entity, Transform{
         .position = position,
         .last_position = position,
         .velocity = {0.0f, 0.0f},
         .rotation = 0.0f,
-        .scale = 2.0f  // 2x scale for player (Gradius-style larger ship!)
+        .scale = scale  // 3x scale (8x8 → 24x24)
     });
 
-    // Calculate frame size from config (not hardcoded!)
-    sf::Vector2i frame_size(constants.player_size.x, constants.player_size.y);
-    if (texture && player_cfg.animation.cols > 0 && player_cfg.animation.rows > 0) {
-        auto texture_size = texture->getSize();
-        frame_size.x = texture_size.x / player_cfg.animation.cols;
-        frame_size.y = texture_size.y / player_cfg.animation.rows;
-    }
+    // Use direct pixel coordinates from config
+    sf::Vector2i frame_size(player_cfg.animation.sprite_width, player_cfg.animation.sprite_height);
+    sf::IntRect texture_rect(
+        player_cfg.animation.sprite_x,
+        player_cfg.animation.sprite_y,
+        player_cfg.animation.sprite_width,
+        player_cfg.animation.sprite_height
+    );
 
     // Sprite
     world.AddComponent<Sprite>(entity, Sprite{
         .texture = texture,
-        .texture_rect = sf::IntRect(0, 0, frame_size.x, frame_size.y),  // First frame
+        .texture_rect = texture_rect,  // Use direct coordinates (idle frame)
         .color = sf::Color::White,
-        .size = sf::Vector2f(frame_size.x, frame_size.y),
-        .origin = sf::Vector2f(frame_size.x / 2.0f, frame_size.y / 2.0f),
-        .layer = 10,  // TODO: Move to config
+        .size = sf::Vector2f(frame_size.x, frame_size.y),  // Actual sprite size (8x8)
+        .origin = sf::Vector2f(frame_size.x / 2.0f, frame_size.y / 2.0f),  // Center (4,4)
+        .layer = 10,
         .visible = true
     });
 
     // Animation - loaded from player.toml!
+    // Always add Animation for player (has banking frames)
     if (!player_cfg.animation.clips.empty()) {
         world.AddComponent<Animation>(entity, CreateAnimationFromConfig(player_cfg.animation, texture));
     }
@@ -378,13 +385,8 @@ Weapon EntityFactory::CreateWeaponFromConfig(const WeaponConfig& wc) {
 Animation EntityFactory::CreateAnimationFromConfig(const AnimationConfig& anim_cfg, sf::Texture* texture) {
     Animation anim;
 
-    // Calculate frame size from texture and config
-    sf::Vector2i frame_size(32, 32);
-    if (texture && anim_cfg.cols > 0 && anim_cfg.rows > 0) {
-        auto texture_size = texture->getSize();
-        frame_size.x = texture_size.x / anim_cfg.cols;
-        frame_size.y = texture_size.y / anim_cfg.rows;
-    }
+    // Use direct sprite dimensions from config (supports non-uniform sprite sheets)
+    sf::Vector2i frame_size(anim_cfg.sprite_width, anim_cfg.sprite_height);
 
     anim.frame_size = frame_size;
     anim.total_cols = anim_cfg.cols;

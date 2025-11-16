@@ -31,9 +31,9 @@ public:
                 transform.velocity = input.move_direction * constants.player_movement_speed;
             }
 
-            // Select animation based on movement direction
+            // Select animation based on velocity (banking animation)
             if (world.HasComponent<Animation>(entity)) {
-                SelectAnimation(world, entity, input);
+                SelectAnimation(world, entity, transform);
             }
         }
     }
@@ -66,21 +66,18 @@ private:
     }
 
 private:
-    // Select appropriate animation based on input
-    static void SelectAnimation(World& world, entt::entity entity, const Input& input) {
+    // Select appropriate animation based on velocity (banking)
+    static void SelectAnimation(World& world, entt::entity entity, const Transform& transform) {
         int anim_id = AnimationSystem::IDLE;
 
-        // Vertical movement (Gradius-style banking)
-        if (input.move_direction.y < -0.1f) {
-            anim_id = AnimationSystem::MOVING_UP;    // Bank up (row 1)
-        } else if (input.move_direction.y > 0.1f) {
-            anim_id = AnimationSystem::MOVING_DOWN;  // Bank down (row 0)
+        // Vertical banking based on velocity (for horizontal shooter)
+        // Idle when moving left/right, bank when moving up/down
+        if (transform.velocity.y < -50.0f) {
+            anim_id = AnimationSystem::MOVING_UP;    // Bank up (right frame)
+        } else if (transform.velocity.y > 50.0f) {
+            anim_id = AnimationSystem::MOVING_DOWN;  // Bank down (left frame)
         }
-
-        // Horizontal movement (if needed for side-facing animations)
-        // Not used in Gradius-style games, but available
-        // if (input.move_direction.x < -0.1f) anim_id = MOVING_LEFT;
-        // if (input.move_direction.x > 0.1f) anim_id = MOVING_RIGHT;
+        // Otherwise stay IDLE (moving left/right horizontally)
 
         AnimationSystem::PlayAnimation(world, entity, anim_id, false, false);
     }

@@ -3,39 +3,44 @@
 
 # Main player ship
 [player.ship]
-sprite_sheet = "viperFrames"
-animation_cols = 3  # 3 columns
-animation_rows = 2  # 2 rows
+sprite_sheet = "SpaceShooterAssetPack_Ships.png"
+animation_cols = 3  # 3 frames (left bank, idle, right bank)
+animation_rows = 5  # 5 player colors in sheet
+sprite_x = 8        # Start with idle frame (middle column)
+sprite_y = 8        # Orange player (row 1)
+sprite_width = 8    # Actual sprite size in sheet
+sprite_height = 8
+size = [24.0, 24.0]  # Render size (3x scale)
 weapon = "plasma_rifle"
 weapon_slot = 1
 
 # Animation definitions for player ship
 [[player.ship.animations]]
 name = "idle"
-id = 0
-row = 0           # Row 0, frame 0
-start_col = 0
+id = 0              # IDLE = 0
+row = 1             # Orange player row
+start_col = 1       # Middle frame (x=8)
 frame_count = 1
 duration = 0.2
 loop = true
 
 [[player.ship.animations]]
-name = "moving_down"
-id = 1
-row = 0           # Row 0 = banking down
-start_col = 0
-frame_count = 3   # All 3 frames in row 0
-duration = 0.1    # Faster banking
-loop = false      # Play once and hold on banked frame!
+name = "bank_left"
+id = 2              # MOVING_DOWN = 2 (repurposed for left banking)
+row = 1             # Orange player row
+start_col = 0       # Left frame (x=0)
+frame_count = 1
+duration = 0.1
+loop = false        # Hold on banked frame
 
 [[player.ship.animations]]
-name = "moving_up"
-id = 2
-row = 1           # Row 1 = banking up
-start_col = 0
-frame_count = 3   # All 3 frames in row 1
-duration = 0.1    # Faster banking
-loop = false      # Play once and hold on banked frame!
+name = "bank_right"
+id = 1              # MOVING_UP = 1 (repurposed for right banking)
+row = 1             # Orange player row
+start_col = 2       # Right frame (x=16)
+frame_count = 1
+duration = 0.1
+loop = false        # Hold on banked frame
 
 # Player exhaust (engine trail)
 [player.exhaust]

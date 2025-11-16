@@ -51,7 +51,7 @@ void ECSPlayState::Setup() {
     std::cout.flush();
     player = factory->CreatePlayer(
         constants.player_starting_position,
-        textureAtlas->GetTexture("playerShip").get()
+        textureAtlas->GetTexture("SpaceShooterAssetPack_Ships").get()
     );
     std::cout << "[ECS] Player created at ("
               << constants.player_starting_position.x << ", "

@@ -115,8 +115,16 @@ public:
 private:
     static void FireSingleShot(entt::entity owner, const Transform& transform,
                               const Weapon& weapon, BulletSpawnCallback spawn_callback) {
-        // Fire straight RIGHT (Gradius horizontal shooter!)
-        sf::Vector2f direction(1.0f, 0.0f);  // Right direction
+        // Calculate direction from velocity (fire in direction of travel!)
+        sf::Vector2f direction = transform.velocity;
+        float length = std::sqrt(direction.x * direction.x + direction.y * direction.y);
+
+        if (length > 0.001f) {
+            direction /= length;  // Normalize velocity to get direction
+        } else {
+            // Fallback for stationary entities: use right direction
+            direction = sf::Vector2f(1.0f, 0.0f);
+        }
 
         BulletSpawnRequest request;
         request.owner = owner;
@@ -132,8 +140,13 @@ private:
 
     static void FireBurst(entt::entity owner, const Transform& transform,
                          const Weapon& weapon, BulletSpawnCallback spawn_callback) {
-        // Fire multiple bullets in a spread pattern around RIGHT direction (Gradius!)
-        float base_angle = 0.0f;  // 0° = right
+        // Calculate base angle from velocity (fire in direction of travel!)
+        float base_angle = std::atan2(transform.velocity.y, transform.velocity.x);
+
+        // Fallback to right if not moving
+        if (transform.velocity.x == 0.0f && transform.velocity.y == 0.0f) {
+            base_angle = 0.0f;  // 0° = right
+        }
 
         int bullets = weapon.bullets_per_shot;
         float spread = weapon.spread_angle * 3.14159f / 180.0f;
@@ -144,7 +157,7 @@ private:
             if (bullets == 1) offset = 0.0f;
 
             float bullet_angle = base_angle + offset;
-            sf::Vector2f direction(std::cos(bullet_angle), std::sin(bullet_angle));  // RIGHT-based angles
+            sf::Vector2f direction(std::cos(bullet_angle), std::sin(bullet_angle));
 
             BulletSpawnRequest request;
             request.owner = owner;
@@ -161,8 +174,14 @@ private:
 
     static void FireRandomSpread(entt::entity owner, const Transform& transform,
                                 const Weapon& weapon, BulletSpawnCallback spawn_callback) {
-        // Fire bullets in random directions within spread angle around RIGHT (Gradius!)
-        float base_angle = 0.0f;  // 0° = right
+        // Calculate base angle from velocity (fire in direction of travel!)
+        float base_angle = std::atan2(transform.velocity.y, transform.velocity.x);
+
+        // Fallback to right if not moving
+        if (transform.velocity.x == 0.0f && transform.velocity.y == 0.0f) {
+            base_angle = 0.0f;  // 0° = right
+        }
+
         float spread = weapon.spread_angle * 3.14159f / 180.0f;
 
         for (int i = 0; i < weapon.bullets_per_shot; ++i) {
@@ -170,7 +189,7 @@ private:
             float random_offset = ((float)rand() / (float)RAND_MAX - 0.5f) * spread;
             float bullet_angle = base_angle + random_offset;
 
-            sf::Vector2f direction(std::cos(bullet_angle), std::sin(bullet_angle));  // RIGHT-based angles
+            sf::Vector2f direction(std::cos(bullet_angle), std::sin(bullet_angle));
 
             BulletSpawnRequest request;
             request.owner = owner;
