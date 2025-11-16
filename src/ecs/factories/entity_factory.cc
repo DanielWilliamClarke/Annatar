@@ -1,5 +1,6 @@
 #include "entity_factory.h"
 #include "util/i_texture_atlas.h"
+#include "util/math_utils.h"
 #include <cmath>
 #include <iostream>
 
@@ -395,8 +396,8 @@ void EntityFactory::CreateExplosion(sf::Vector2f position, sf::Color color, int 
     const float lifetime = 0.5f;
 
     for (int i = 0; i < particle_count; ++i) {
-        float angle = (float)i / (float)particle_count * TWO_PI;
-        sf::Vector2f velocity(std::cos(angle) * speed, std::sin(angle) * speed);
+        auto theta = AngleConversion::ToRadians((float)randomSource->Generate(0, 360));
+        sf::Vector2f velocity(std::cos(theta) * speed, std::sin(theta) * speed);
         CreateParticle(position, velocity, color, lifetime, 4.0f);
     }
 }

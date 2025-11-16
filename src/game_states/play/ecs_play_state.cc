@@ -1,6 +1,7 @@
 #include "ecs_play_state.h"
 #include "renderer/i_renderer.h"
 #include "util/texture_atlas.h"
+#include "util/random_number_mersenne_source.cc"
 #include <iostream>
 
 ECSPlayState::ECSPlayState(
@@ -32,10 +33,14 @@ void ECSPlayState::Setup() {
     const auto& constants = config.GetConstants();
     std::cout << "[ECS] Configuration loaded successfully" << std::endl;
 
+    // Initialize random number generator
+	auto seed = (unsigned int)std::chrono::system_clock::now().time_since_epoch().count();
+	auto randGenerator = std::make_unique<RandomNumberMersenneSource<int>>(seed);
+	
     // Create entity factory
     std::cout << "[ECS] Creating entity factory..." << std::endl;
     std::cout.flush();
-    factory = std::make_unique<ecs::EntityFactory>(world, config);
+    factory = std::make_unique<ecs::EntityFactory>(world, config, std::move(randGenerator));
     factory->SetTextureAtlas(textureAtlas);  // Allows factory to load textures from config
     std::cout << "[ECS] Entity factory created" << std::endl;
 

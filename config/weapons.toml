@@ -6,10 +6,10 @@ name = "Plasma Rifle"
 type = "single_shot"
 cooldown = 0.2
 damage = 25.0
-bullet_speed = 600.0
+bullet_speed = 800.0
 bullets_per_shot = 1
 spread_angle = 0.0
-bullet_size = [8.0, 16.0]
+bullet_size = [2.0, 8.0]
 bullet_color = [0, 255, 255]  # Cyan
 
 [weapons.shotgun]
@@ -37,11 +37,11 @@ bullet_color = [255, 255, 0]  # Yellow
 [weapons.spread_cannon]
 name = "Spread Cannon"
 type = "random_spread"
-cooldown = 0.4
+cooldown = 5.0
 damage = 20.0
-bullet_speed = 550.0
-bullets_per_shot = 8
-spread_angle = 45.0
+bullet_speed = 200.0
+bullets_per_shot = 25
+spread_angle = 360.0
 bullet_size = [8.0, 8.0]
 bullet_color = [255, 100, 255]  # Pink
 

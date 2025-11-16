@@ -5,6 +5,7 @@
 #include "../config/config_loader.h"
 #include "../systems/weapon_system.h"
 #include "util/i_texture_atlas.h"
+#include "util/i_random_number_source.h"
 #include <SFML/Graphics.hpp>
 #include <optional>
 #include <memory>
@@ -16,8 +17,8 @@ namespace ecs {
  */
 class EntityFactory {
 public:
-    EntityFactory(World& world, const ConfigLoader& config)
-        : world(world), config(config), textureAtlas(nullptr) {}
+    EntityFactory(World& world, const ConfigLoader& config, std::unique_ptr<IRandomNumberSource<int>> randomSource)
+        : world(world), config(config), randomSource(std::move(randomSource)),textureAtlas(nullptr) {}
 
     // Set texture atlas for loading textures by name
     void SetTextureAtlas(std::shared_ptr<ITextureAtlas> atlas) { textureAtlas = atlas; }
@@ -50,6 +51,7 @@ private:
     World& world;
     const ConfigLoader& config;
     std::shared_ptr<ITextureAtlas> textureAtlas;
+    const std::unique_ptr<IRandomNumberSource<int>> randomSource;
 
     // Helper to create weapon component from config
     Weapon CreateWeaponFromConfig(const WeaponConfig& wc);
