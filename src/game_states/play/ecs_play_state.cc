@@ -168,6 +168,9 @@ void ECSPlayState::Update(float dt) {
 }
 
 void ECSPlayState::Draw(const std::shared_ptr<IRenderer>& renderer, float interp) const {
+    // Render glow effects for bullets and explosions
+    ecs::RenderSystem::RenderGlow(const_cast<ecs::World&>(world), *renderer, interp);
+
     // Render all ECS entities with interpolation
     // Note: RenderSystem::Render takes non-const world, but only reads
     ecs::RenderSystem::Render(const_cast<ecs::World&>(world), renderer->GetTarget(), interp);

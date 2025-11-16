@@ -270,6 +270,13 @@ struct Background {
     int layer{0};  // Which parallax layer (0-3)
 };
 
+// Glow component - for glow shader effects (bullets, explosions, etc.)
+struct Glow {
+    sf::Color color{255, 255, 255};  // Glow color
+    float attenuation{500.0f};  // Light attenuation factor (higher = tighter glow, typical: 300-500)
+    bool enabled{true};  // Can be toggled on/off
+};
+
 // Tags for entity types (empty structs, presence indicates type)
 struct PlayerTag {};
 struct EnemyTag {};

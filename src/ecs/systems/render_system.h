@@ -2,6 +2,8 @@
 #define ECS_RENDER_SYSTEM_H
 
 #include "../world.h"
+#include "../../renderer/i_glow_shader_renderer.h"
+#include "../../renderer/i_renderer.h"
 #include <SFML/Graphics.hpp>
 #include <algorithm>
 #include <vector>
@@ -46,6 +48,28 @@ public:
             );
 
             RenderSprite(target, sprite, render_pos, transform.rotation, transform.scale);
+        }
+    }
+
+    // Render glow effects using an IRenderer (uses renderer's AddGlow method)
+    static void RenderGlow(World& world, class IRenderer& renderer, float interpolation = 1.0f) {
+        auto view = world.View<Transform, Glow>();
+
+        for (auto entity : view) {
+            const auto& transform = view.get<Transform>(entity);
+            const auto& glow = view.get<Glow>(entity);
+
+            if (!glow.enabled) continue;
+
+            // Interpolate position for smooth rendering
+            sf::Vector2f render_pos = Interpolate(
+                transform.last_position,
+                transform.position,
+                interpolation
+            );
+
+            // Add glow at entity position
+            renderer.AddGlow(render_pos, glow.color, glow.attenuation);
         }
     }
 

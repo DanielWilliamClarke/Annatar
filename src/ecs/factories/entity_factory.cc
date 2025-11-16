@@ -261,6 +261,13 @@ entt::entity EntityFactory::CreateBullet(const std::string& weapon_name,
         .visible = true
     });
 
+    // Glow effect
+    world.AddComponent<Glow>(entity, Glow{
+        .color = wc.bullet_color,
+        .attenuation = 300.0f,  // Higher value = tighter glow (legacy uses 500.0f)
+        .enabled = true
+    });
+
     // Collision
     world.AddComponent<Collision>(entity, Collision{
         .shape = Collision::Shape::CIRCLE,
@@ -313,6 +320,13 @@ entt::entity EntityFactory::CreateBullet(const BulletSpawnRequest& request,
         .visible = true
     });
 
+    // Glow effect
+    world.AddComponent<Glow>(entity, Glow{
+        .color = request.color,
+        .attenuation = 300.0f,  // Higher value = tighter glow (legacy uses 500.0f)
+        .enabled = true
+    });
+
     // Collision
     world.AddComponent<Collision>(entity, Collision{
         .shape = Collision::Shape::CIRCLE,
@@ -354,6 +368,13 @@ entt::entity EntityFactory::CreateParticle(sf::Vector2f position, sf::Vector2f v
         .origin = {size * 0.5f, size * 0.5f},
         .layer = 1,
         .visible = true
+    });
+
+    // Glow effect for explosion particles
+    world.AddComponent<Glow>(entity, Glow{
+        .color = color,
+        .attenuation = 100.0f,  // Lower value = larger glow for explosions
+        .enabled = true
     });
 
     // Lifetime
