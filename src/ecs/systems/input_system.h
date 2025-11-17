@@ -2,6 +2,7 @@
 #define ECS_INPUT_SYSTEM_H
 
 #include "../world.h"
+#include "util/math_utils.h"
 #include <SFML/Graphics.hpp>
 #include <unordered_map>
 
@@ -14,17 +15,21 @@ namespace ecs {
 class InputSystem {
 public:
     // Update all Input components from keyboard state
-    static void Update(World& world) {
-        auto view = world.View<Input>();
+    static void Update(World& world, const sf::RenderWindow& window) {
+       auto view = world.View<Input, Transform>();
 
         for (auto entity : view) {
             auto& input = view.get<Input>(entity);
+            auto& transform = view.get<Transform>(entity);
 
             // Sample movement input
             input.move_direction = SampleMovement();
 
             // Sample fire button
             input.fire = sf::Keyboard::isKeyPressed(sf::Keyboard::Space);
+
+            // aim with mouse position (convert from screen pixels to world coords)
+            SampleMouseAim(input, window, transform.position);
 
             // Sample weapon slot toggles (1-4 keys)
             UpdateWeaponSlots(input);
@@ -92,6 +97,18 @@ private:
         }
 
         key_pressed[key] = currently_pressed;
+    }
+
+    static void SampleMouseAim(Input& input, const sf::RenderWindow& window,
+                                       sf::Vector2f player_position = sf::Vector2f(0.0f, 0.0f)) {
+        // Get mouse in window pixel space, convert to world space using current view
+        sf::Vector2i mouse_pixels = sf::Mouse::getPosition(window);
+        input.mouse_position = window.mapPixelToCoords(mouse_pixels);
+
+        sf::Vector2f aim_dir = input.mouse_position - player_position;
+        if (aim_dir.x != 0.0f || aim_dir.y != 0.0f) {
+            input.aim_direction = Dimensions::Normalise(aim_dir);
+        }
     }
 };
 

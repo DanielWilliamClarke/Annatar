@@ -9,6 +9,8 @@
 #include "ecs/systems/enemy_spawn_system.h"
 #include <memory>
 
+namespace sf { class RenderWindow; }
+
 class ITextureAtlas;
 class IRenderer;
 class PlayerInput;
@@ -21,6 +23,7 @@ class ECSPlayState : public State<GameStates> {
 public:
     ECSPlayState(
         std::shared_ptr<ITextureAtlas> textureAtlas,
+        std::shared_ptr<sf::RenderWindow> window,
         sf::FloatRect bounds
     );
     ~ECSPlayState() override = default;
@@ -40,6 +43,7 @@ private:
 
     // Game resources
     std::shared_ptr<ITextureAtlas> textureAtlas;
+    std::shared_ptr<sf::RenderWindow> window;
     sf::FloatRect bounds;
     float worldSpeed;
 

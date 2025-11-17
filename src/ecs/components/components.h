@@ -215,6 +215,8 @@ struct Score {
 // Input component - player input state
 struct Input {
     sf::Vector2f move_direction{0.0f, 0.0f};
+    sf::Vector2f aim_direction{0.0f, 0.0f};
+    sf::Vector2f mouse_position{0.0f, 0.0f};
     bool fire{false};
     bool weapon_slot_1{false};
     bool weapon_slot_2{false};

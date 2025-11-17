@@ -2,13 +2,16 @@
 #include "renderer/i_renderer.h"
 #include "util/texture_atlas.h"
 #include "util/random_number_mersenne_source.cc"
+#include <SFML/Graphics.hpp>
 #include <iostream>
 
 ECSPlayState::ECSPlayState(
     std::shared_ptr<ITextureAtlas> textureAtlas,
+    std::shared_ptr<sf::RenderWindow> window,
     sf::FloatRect bounds
 )
     : textureAtlas(textureAtlas)
+    , window(window)
     , bounds(bounds)
     , worldSpeed(100.0f)
     , player(entt::null)
@@ -101,7 +104,7 @@ void ECSPlayState::Update(float dt) {
     // === PURE ECS SYSTEM UPDATE ORDER ===
 
     // 1. Input System - Sample keyboard, update Input components
-    ecs::InputSystem::Update(world);
+    ecs::InputSystem::Update(world, *window);
 
     // 2. Movement Input System - Apply input to velocity/acceleration and select animations
     ecs::MovementInputSystem::Update(world, config.GetConstants(), dt);  // Pass dt for physics!

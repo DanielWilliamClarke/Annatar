@@ -88,6 +88,7 @@ void Game::InitGameStates()
 	// NEW: ECS play state
 	auto ecsPlayState = std::make_shared<ECSPlayState>(
 		this->textureAtlas,
+		this->window,
 		this->bounds
 	);
 

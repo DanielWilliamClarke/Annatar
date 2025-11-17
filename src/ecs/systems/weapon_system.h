@@ -79,18 +79,22 @@ public:
         // Reset cooldown
         weapon.current_cooldown = weapon.cooldown;
 
+        const Input* input = world.HasComponent<Input>(entity)
+            ? &world.GetComponent<Input>(entity)
+            : nullptr;
+
         // Fire based on weapon type
         switch (weapon.type) {
             case Weapon::Type::SINGLE_SHOT:
-                FireSingleShot(entity, transform, weapon, spawn_callback);
+                FireSingleShot(entity, transform, weapon, input, spawn_callback);
                 break;
 
             case Weapon::Type::BURST:
-                FireBurst(entity, transform, weapon, spawn_callback);
+                FireBurst(entity, transform, weapon, input, spawn_callback);
                 break;
 
             case Weapon::Type::RANDOM_SPREAD:
-                FireRandomSpread(entity, transform, weapon, spawn_callback);
+                FireRandomSpread(entity, transform, weapon, input, spawn_callback);
                 break;
 
             case Weapon::Type::BEAM:
@@ -112,6 +116,9 @@ public:
         if (world.HasComponent<Weapons>(entity)) {
             auto& weapons = world.GetComponent<Weapons>(entity);
             const auto& transform = world.GetComponent<Transform>(entity);
+            const Input* input = world.HasComponent<Input>(entity)
+                ? &world.GetComponent<Input>(entity)
+                : nullptr;
 
             // Fire each active weapon slot
             for (int i = 0; i < 4; ++i) {
@@ -126,15 +133,15 @@ public:
                         // Fire based on weapon type
                         switch (weapon.type) {
                             case Weapon::Type::SINGLE_SHOT:
-                                FireSingleShot(entity, transform, weapon, spawn_callback);
+                                FireSingleShot(entity, transform, weapon, input, spawn_callback);
                                 break;
 
                             case Weapon::Type::BURST:
-                                FireBurst(entity, transform, weapon, spawn_callback);
+                                FireBurst(entity, transform, weapon, input, spawn_callback);
                                 break;
 
                             case Weapon::Type::RANDOM_SPREAD:
-                                FireRandomSpread(entity, transform, weapon, spawn_callback);
+                                FireRandomSpread(entity, transform, weapon, input, spawn_callback);
                                 break;
 
                             case Weapon::Type::BEAM:
@@ -172,18 +179,28 @@ public:
     }
 
 private:
-    static void FireSingleShot(entt::entity owner, const Transform& transform,
-                              const Weapon& weapon, BulletSpawnCallback spawn_callback) {
-        // Calculate direction from velocity (fire in direction of travel!)
+    static sf::Vector2f ResolveDirection(const Transform& transform, const Input* input) {
+        // Prefer explicit aim direction (e.g. player mouse aim)
+        if (input && (input->aim_direction.x != 0.0f || input->aim_direction.y != 0.0f)) {
+            return input->aim_direction;
+        }
+
+        // Fall back to movement velocity (enemy behavior)
         sf::Vector2f direction = transform.velocity;
         float length = std::sqrt(direction.x * direction.x + direction.y * direction.y);
 
         if (length > 0.001f) {
             direction /= length;  // Normalize velocity to get direction
         } else {
-            // Fallback for stationary entities: use right direction
-            direction = sf::Vector2f(1.0f, 0.0f);
+            direction = sf::Vector2f(1.0f, 0.0f);  // Default direction
         }
+        return direction;
+    }
+
+    static void FireSingleShot(entt::entity owner, const Transform& transform,
+                              const Weapon& weapon, const Input* input,
+                              BulletSpawnCallback spawn_callback) {
+        sf::Vector2f direction = ResolveDirection(transform, input);
 
         BulletSpawnRequest request;
         request.owner = owner;
@@ -198,14 +215,10 @@ private:
     }
 
     static void FireBurst(entt::entity owner, const Transform& transform,
-                         const Weapon& weapon, BulletSpawnCallback spawn_callback) {
-        // Calculate base angle from velocity (fire in direction of travel!)
-        float base_angle = std::atan2(transform.velocity.y, transform.velocity.x);
-
-        // Fallback to right if not moving
-        if (transform.velocity.x == 0.0f && transform.velocity.y == 0.0f) {
-            base_angle = 0.0f;  // 0° = right
-        }
+                         const Weapon& weapon, const Input* input,
+                         BulletSpawnCallback spawn_callback) {
+        sf::Vector2f aim = ResolveDirection(transform, input);
+        float base_angle = std::atan2(aim.y, aim.x);
 
         int bullets = weapon.bullets_per_shot;
         float spread = weapon.spread_angle * 3.14159f / 180.0f;
@@ -232,14 +245,10 @@ private:
     }
 
     static void FireRandomSpread(entt::entity owner, const Transform& transform,
-                                const Weapon& weapon, BulletSpawnCallback spawn_callback) {
-        // Calculate base angle from velocity (fire in direction of travel!)
-        float base_angle = std::atan2(transform.velocity.y, transform.velocity.x);
-
-        // Fallback to right if not moving
-        if (transform.velocity.x == 0.0f && transform.velocity.y == 0.0f) {
-            base_angle = 0.0f;  // 0° = right
-        }
+                                const Weapon& weapon, const Input* input,
+                                BulletSpawnCallback spawn_callback) {
+        sf::Vector2f aim = ResolveDirection(transform, input);
+        float base_angle = std::atan2(aim.y, aim.x);
 
         float spread = weapon.spread_angle * 3.14159f / 180.0f;
 

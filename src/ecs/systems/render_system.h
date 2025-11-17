@@ -39,6 +39,7 @@ public:
         for (auto entity : entities) {
             const auto& transform = world.GetComponent<Transform>(entity);
             const auto& sprite = world.GetComponent<Sprite>(entity);
+            const auto input = world.TryGetComponent<Input>(entity);
 
             // Interpolate position for smooth rendering
             sf::Vector2f render_pos = Interpolate(
@@ -48,6 +49,10 @@ public:
             );
 
             RenderSprite(target, sprite, render_pos, transform.rotation, transform.scale);
+
+            if (input) {
+                RenderAim(target, render_pos, input->mouse_position);
+            }
         }
     }
 
@@ -126,6 +131,19 @@ private:
             sf_sprite.setColor(sprite.color);
             target.draw(sf_sprite);
         }
+    }
+
+    static void RenderAim(sf::RenderTarget& target, const sf::Vector2f& position,
+                        const sf::Vector2f& mouse_position) {
+
+        auto color = sf::Color(255, 0, 0, 100);
+                            
+        sf::Vertex line[] =
+        {
+            sf::Vertex(position, color),
+            sf::Vertex(mouse_position, color)
+        };
+        target.draw(line, 2, sf::Lines);
     }
 
     static sf::Vector2f Interpolate(const sf::Vector2f& a, const sf::Vector2f& b, float t) {

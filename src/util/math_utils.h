@@ -1,6 +1,7 @@
 #ifndef MATH_HELPERS_H
 #define MATH_HELPERS_H
 
+#include <SFML/Graphics.hpp>
 #include <numbers>
 #include <cmath>
 
